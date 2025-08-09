@@ -1,0 +1,9 @@
+python-pptx
+Pillow
+pytesseract
+google-genai
+rich
+opencv-python
+numpy
+simple-term-menu
+python-dotenv
