@@ -6,15 +6,27 @@ from simple_term_menu import TerminalMenu
 def main():
     # Take the file either as argument or through CLI files.
     options = ["PPTX file", "Image file", "Folder containing images"]
-    terminal_menu = TerminalMenu(options, title="Select input type:")
-    menu_index = terminal_menu.show()
+    choice = 0
 
-    print("\n")
-    if menu_index is None:
-        print("No option selected, exiting...")
-        sys.exit(1)
+    if os.name == "nt":
+        for i, option in enumerate(options, 1):
+            print(f"{i}. {option}")
+        choice = input("Enter choice number: ")
+        try:
+            choice = options[int(choice) - 1]
+        except (ValueError, IndexError):
+            print("Invalid choice, exiting...")
+            sys.exit(1)
+    else:
+        terminal_menu = TerminalMenu(options, title="Select input type:")
+        menu_index = terminal_menu.show()
 
-    choice = options[menu_index]
+        print("\n")
+        if menu_index is None:
+            print("No option selected, exiting...")
+            sys.exit(1)
+
+        choice = options[menu_index]
 
     if choice == "PPTX file":
         import pptx_parser
