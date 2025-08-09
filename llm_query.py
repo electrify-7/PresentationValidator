@@ -5,6 +5,7 @@ import json
 from dotenv import get_key
 import re
 import sys
+import os
 
 load_dotenv()
 api_key = get_key(".env", "GOOGLE_API_KEY")
@@ -20,6 +21,13 @@ def extract_json_object(text):
     text = re.sub(r"^```.*\n", "", text, flags=re.MULTILINE)
     # same for at the last
     text = re.sub(r"\s*```$", "", text.strip())
+
+    if os.name == "nt":
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        # Remove any BOM or zero-width spaces just in case
+        text = text.replace("\ufeff", "").replace("\u200b", "")
+
+
     # only the matching portion in { }
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if match:

@@ -1,7 +1,6 @@
 import sys
 import image_preprocessing
 import os
-from simple_term_menu import TerminalMenu
 
 def main():
     # Take the file either as argument or through CLI files.
@@ -18,6 +17,7 @@ def main():
             print("Invalid choice, exiting...")
             sys.exit(1)
     else:
+        from simple_term_menu import TerminalMenu
         terminal_menu = TerminalMenu(options, title="Select input type:")
         menu_index = terminal_menu.show()
 
@@ -29,6 +29,7 @@ def main():
         choice = options[menu_index]
 
     if choice == "PPTX file":
+        print("Downloading Dependencies...\n")
         import pptx_parser
         import image_captioning
         import json_converter
