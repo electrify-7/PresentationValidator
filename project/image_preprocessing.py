@@ -1,5 +1,4 @@
 import os
-import hashlib
 from PIL import Image, ImageOps, ImageFilter
 import pytesseract
 from pytesseract import Output
