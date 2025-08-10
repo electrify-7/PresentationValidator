@@ -86,18 +86,19 @@ def _remove_bom_and_cr(text: str) -> str:
 
 #### DO NOT REMOVE. Literally breaks everything if not included:
 def _remove_code_fences(text: str) -> str:
-    text = re.sub(r"^```(?:json)?\s*\n", "", text, flags=re.MULTILINE)
-    text = re.sub(r"\n?```$", "", text.strip())
+    text = re.sub(r"^```(?:json)?\s*\r?\n", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\r?\n```$", "", text.strip())
     return text
 
 def try_load_json_from_text(text: str):
 
     # if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')):
     #     text = text[1:-1]
-    
-    text = _remove_code_fences(text)
     text = _remove_bom_and_cr(text)
-    text = _strip_control_chars(text)
+    text = _strip_control_chars(text)    
+
+    text = _remove_code_fences(text)
+
 
     text = text.strip()
     if text.startswith("\\'") and text.endswith("\\'"):
