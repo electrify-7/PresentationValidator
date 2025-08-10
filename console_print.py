@@ -7,7 +7,7 @@ except ImportError:
     RICH_AVAILABLE = False
 
 def pretty_print(data):
-    if RICH_AVAILABLE:  
+    if not RICH_AVAILABLE:  
         console = Console(force_terminal=True)
         console.print(
             Panel.fit(
