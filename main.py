@@ -66,6 +66,10 @@ def main():
             #pprint.pprint(response)
             console_print.pretty_print(response)
     elif choice == "Folder containing images":
+        if os.name == 'nt' and 'TESSERACT_CMD' in os.environ:
+            import pytesseract
+            pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_CMD']
+
         import image_preprocessing
         import json_converter
         import llm_query
@@ -101,6 +105,10 @@ def main():
             console_print.pretty_print(response)     
 
     elif choice == "Images":
+            if os.name == 'nt' and 'TESSERACT_CMD' in os.environ:
+                import pytesseract
+                pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_CMD']            
+
             import image_preprocessing
             import json_converter
             import llm_query

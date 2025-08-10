@@ -49,6 +49,14 @@ def run_main_script(venv_dir="venv"):
     print("\n")
     env = os.environ.copy()
     env["PYTHON_FORCE_COLOR"] = "1"
+
+    if os.name == 'nt':  # Windows
+        env['TESSERACT_CMD'] = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+        if not os.path.exists(r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
+            if os.path.exists(r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'):
+                env['TESSERACT_CMD'] = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+
     subprocess.check_call(command)
 
 def main():
