@@ -10,7 +10,7 @@ import os
 import logging
 
 load_dotenv()
-api_key = get_key(".env", "GOOGLE_API_KEY")
+api_key = get_key(".env", "API_KEY")
 
 if not api_key:
     print("Please put your api_key in .env")
