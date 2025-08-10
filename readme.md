@@ -10,6 +10,7 @@
 - Detects inconsistencies and formatting issues.
 - Works on macOS, Linux, and Windows.
 - Console-friendly output with structured formatting.
+- Scalability Mode: For large presentations (20+ slides), the system automatically pre-processes slides with an LLM to extract only the most important details — reducing token usage while maintaining all essential meaning for accurate analysis.
 
 ---
 
@@ -30,7 +31,15 @@
      python3 --version
      ```
 
-3. **Run the Script**
+3. **Add Your API Key**
+   - Create a file named `.env` in the project folder.
+   - Add your LLM API key in this format:
+     ```
+     API_KEY=your_api_key_here
+     ```
+   - This key will be used to connect to the LLM for analysis.
+
+4. **Run the Script**
    - Open your terminal (macOS/Linux) or Command Prompt (Windows).
    - Navigate to the extracted folder.
    - Run:
