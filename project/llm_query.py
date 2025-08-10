@@ -1,6 +1,6 @@
 from google import genai
 from google.genai.types import GenerateContentConfig
-from prompt import query_prompt
+from project.prompt import query_prompt
 from dotenv import load_dotenv
 import json
 from dotenv import get_key

@@ -29,11 +29,11 @@ def main():
 
     if choice == "PPTX file":
         print("Downloading Dependencies...\n")
-        import pptx_parser
-        import image_captioning
-        import json_converter
-        import llm_query
-        import console_print
+        import project.pptx_parser as pptx_parser
+        import project.image_captioning as image_captioning
+        import project.json_converter as json_converter
+        import project.llm_query as llm_query
+        import project.console_print as console_print
 
         file_address = input("Enter the pptx file path: ").strip()
         if not file_address:
@@ -70,10 +70,10 @@ def main():
             import pytesseract
             pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_CMD']
 
-        import image_preprocessing
-        import json_converter
-        import llm_query
-        import console_print
+        import project.image_preprocessing as image_preprocessing
+        import project.json_converter as json_converter
+        import project.llm_query as llm_query
+        import project.console_print as console_print
 
         file_address = input("Enter the folder's address: ").strip()
         if not file_address:
@@ -109,10 +109,10 @@ def main():
                 import pytesseract
                 pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_CMD']            
 
-            import image_preprocessing
-            import json_converter
-            import llm_query
-            import console_print
+            import project.image_preprocessing as image_preprocessing
+            import project.json_converter as json_converter
+            import project.llm_query as llm_query
+            import project.console_print as console_print
 
             file_addresses = input("Enter the image file paths separated by space: ").strip().split()
             if not file_addresses:
