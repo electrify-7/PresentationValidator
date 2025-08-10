@@ -12,9 +12,9 @@ def extract_text_from_image(image_bytes):
 def caption(collected_data):
     for image_info in collected_data.get('images', []):
         if 'blob' in image_info and image_info['blob']:
-            # Extract OCR text from the image blob
             ocr_text = extract_text_from_image(image_info['blob'])
             image_info['ocr_text'] = ocr_text
+            del image_info['blob']  # remove the blob as well, not needed!
         else:
             image_info['ocr_text'] = ""
     return collected_data

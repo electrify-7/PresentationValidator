@@ -4,30 +4,33 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 
 ###
 
-def extract_shapes(shapes, collected_data, slide_index):
+def extract_shapes(shapes, collected_data, slide_index, slide_elements, image_counter):
     for shape in shapes:
         # Group shapes in any pptx
         if shape.shape_type == MSO_SHAPE_TYPE.GROUP:  
-            extract_shapes(shape.shapes, collected_data, slide_index)
+            extract_shapes(shape.shapes, collected_data, slide_index, slide_elements, image_counter)
+            continue
         
         # Extract text content from shapes with a text frame
         if hasattr(shape, 'has_text_frame') and shape.has_text_frame:
+            paragraphs = []
             for paragraph in shape.text_frame.paragraphs:
                 text = ''.join(run.text for run in paragraph.runs)
                 if text:
-                    #print("Text:", text)
-                    collected_data['texts'].append({
-                        'slide': slide_index,
-                        'text': text
-                    })
+                    paragraphs.append(text)
+            full_text = "\n".join(paragraphs).strip()
+            if full_text:
+                collected_data['texts'].append({'slide': slide_index, 'text': full_text})
+                # ordered element
+                slide_elements.append({'type': 'text', 'slide': slide_index, 'text': full_text,
+                                       'shape_name': getattr(shape, 'name', None),
+                                       'is_placeholder': getattr(shape, 'is_placeholder', False)})
 
-            # Also extract alternate text if available (+ image alt)
+            # Also extract alternate text if available (+ image alt thing)
             if hasattr(shape, 'alt_text') and shape.alt_text.strip():
-                #print("Alt Text:", shape.alt_text.strip())
-                collected_data['alt_texts'].append({
-                    'slide': slide_index,
-                    'alt_text': shape.alt_text.strip()
-                })
+                collected_data['alt_texts'].append({'slide': slide_index, 'alt_text': shape.alt_text.strip()})
+                slide_elements.append({'type': 'alt_text', 'slide': slide_index, 'alt_text': shape.alt_text.strip(),
+                                       'shape_name': getattr(shape, 'name', None)})
         
         # Extract text from tables
         if hasattr(shape, 'has_table') and shape.has_table:
@@ -37,10 +40,9 @@ def extract_shapes(shapes, collected_data, slide_index):
                 row_data = [cell.text.strip() for cell in row.cells]
                 table_data.append(row_data)
 
-            collected_data['tables'].append({
-                'slide': slide_index,
-                'table': table_data
-            })
+            collected_data['tables'].append({'slide': slide_index, 'table': table_data})
+            slide_elements.append({'type': 'table', 'slide': slide_index, 'table': table_data,
+                                   'shape_name': getattr(shape, 'name', None)})
             #print("Table text: ", table_data)
 
         # Extract image_data.
@@ -48,6 +50,7 @@ def extract_shapes(shapes, collected_data, slide_index):
             try:
                 image = shape.image
                 image_bytes = image.blob
+                image_counter[0] += 1
                 filename = f"slide{slide_index}_image_{getattr(shape, 'shape_id', 'unknown')}.{image.ext}"  #num-id/u-jpeg type
 
                 image_info = {
@@ -56,12 +59,19 @@ def extract_shapes(shapes, collected_data, slide_index):
                     'blob': image_bytes,      
                     'ext': image.ext,
                     'content_type': image.content_type,
-                    'shape_id': getattr(shape, 'shape_id', None)
+                    'shape_id': getattr(shape, 'shape_id', None),
+                    'shape_name': getattr(shape, 'name', None)
                 }
                 if hasattr(shape, 'alt_text') and shape.alt_text.strip():
                     image_info['alt_text'] = shape.alt_text.strip()
 
                 collected_data['images'].append(image_info)
+                slide_elements.append({'type': 'image', 'slide': slide_index, 'filename': filename,
+                                       'ext': image.ext, 'content_type': image.content_type,
+                                       'shape_id': getattr(shape, 'shape_id', None),
+                                       'shape_name': getattr(shape, 'name', None),
+                                       'alt_text': image_info.get('alt_text', None),
+                                       'blob': image_bytes})
             except Exception as ex:
                 print(f"couldn't parse: {slide_index}: {ex}")
 
@@ -97,6 +107,8 @@ def extract_shapes(shapes, collected_data, slide_index):
                 )
 
                 collected_data['charts'].append(chart_data)
+                slide_elements.append({'type': 'chart', 'slide': slide_index, 'chart': chart_data,
+                                       'shape_name': getattr(shape, 'name', None)})
             except Exception as ex:
                 print(f"couldn't read chart on: {slide_index}: {ex}")
 
@@ -113,11 +125,13 @@ def parse(file_path):
         'images': [],  
         'charts': [],
         'notes': [],
+        'elements': []
     }
 
     # catch errors incase the path wasn't forwarded.
     try:
         presentation = Presentation(file_path)
+        image_counter = [0]
         for i, slide in enumerate(presentation.slides, start=1):
             #print(f"\n--- Slide {i+1} ---")
             try:
@@ -133,8 +147,10 @@ def parse(file_path):
             except Exception:
                 collected_data['slide_titles'].append({'slide': i, 'title': None})
             
-            extract_shapes(slide.shapes, collected_data, slide_index=i)
+            slide_elements = []
+            extract_shapes(slide.shapes, collected_data, slide_index=i, slide_elements=slide_elements, image_counter=image_counter)
                 
+            collected_data['elements'].append({'slide': i, 'elements': slide_elements})
             # Extract user notes if they exist.
             if hasattr(slide, 'notes_slide') and slide.notes_slide:
                 notes_text_frame = slide.notes_slide.notes_text_frame

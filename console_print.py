@@ -1,6 +1,3 @@
-import json
-import sys
-
 try:
     from rich.console import Console
     from rich.table import Table
@@ -62,20 +59,30 @@ def pretty_print(data):
 
     else:
         #incase no rich console available (generic 80 by 80 size)
-        print("=" * 80)
+        line_sep = "=" * 80
+        sub_sep = "-" * 80
+
+        # Summary Section
+        print(line_sep)
         print("SUMMARY")
-        print("=" * 80)
-        print(data["summary"])
-        print("\nINCONSISTENCIES:")
-        for item in data["inconsistencies"]:
-            slides_str = ", ".join(str(s) for s in item['slides'])
-            print(f"\nID: {item['id']}")
-            print(f"Type: {item['type']}")
-            print(f"Slides: {slides_str}")
-            print(f"Conflict Kind: {item['conflict_kind']}")
-            print(f"Severity: {item['severity']}")
-            print(f"Explanation: {item['explanation']}")
-            print(f"Suggested Fix: {item['suggested_fix']}")
-            print("Statements:")
+        print(line_sep)
+        print(data["summary"].strip())
+        print()
+
+        # Inconsistencies Section
+        print(line_sep)
+        print("INCONSISTENCIES")
+        print(line_sep)
+
+        for idx, item in enumerate(data["inconsistencies"], 1):
+            print(f"\n[{idx}] ID: {item['id']}")
+            print(f"    Type          : {item['type']}")
+            print(f"    Slides        : {', '.join(str(s) for s in item['slides'])}")
+            print(f"    Conflict Kind : {item['conflict_kind']}")
+            print(f"    Severity      : {item['severity']}")
+            print(f"    Explanation   : {item['explanation']}")
+            print(f"    Suggested Fix : {item['suggested_fix']}")
+            print("    Statements:")
             for stmt in item["statements"]:
-                print(f"  Slide {stmt['slide']}: {stmt['text']}")
+                print(f"        - Slide {stmt['slide']}: {stmt['text']}")
+            print(sub_sep)
